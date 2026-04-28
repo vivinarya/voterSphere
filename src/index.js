@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Simple in-memory session store for Chatbot instances
 const sessions = new Map();

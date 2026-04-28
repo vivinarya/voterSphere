@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, User, FileText, MapPin, CreditCard, Building2, AlertCircle, Info, Send, Trash2, Globe } from "lucide-react";
+import { Bot, User, FileText, MapPin, CreditCard, Building2, AlertCircle, Info, Send, Trash2, Globe, ChevronDown, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "./lib/utils";
 
@@ -109,7 +109,20 @@ function IndianVoterAssistant() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [sessionId, setSessionId] = React.useState("");
   const [language, setLanguage] = React.useState("English");
+  const [langOpen, setLangOpen] = React.useState(false);
+  const langRef = React.useRef<HTMLDivElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const sendStart = React.useCallback(async (session: string, lang: string) => {
     setIsLoading(true);
@@ -153,6 +166,16 @@ function IndianVoterAssistant() {
     setSessionId("");
     setMessages([]);
     sendStart("", language);
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+    setLangOpen(false);
+    // Clear session and restart in the new language
+    localStorage.removeItem('votersphere_session');
+    setSessionId("");
+    setMessages([]);
+    sendStart("", lang);
   };
 
   const scrollToBottom = () => {
@@ -239,18 +262,46 @@ function IndianVoterAssistant() {
             {/* Navigation and Actions */}
             <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
               {/* Language Dropdown */}
-              <div className="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 shadow-sm">
-                <Globe className="w-4 h-4 text-gray-500" />
-                <select 
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    aria-label="Select language"
-                    className="bg-transparent text-sm text-gray-700 dark:text-gray-300 outline-none cursor-pointer"
+              <div className="relative" ref={langRef}>
+                <button
+                  onClick={() => setLangOpen(!langOpen)}
+                  aria-label="Select language"
+                  className="flex items-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 shadow-sm hover:border-orange-300 dark:hover:border-orange-600 transition-colors cursor-pointer"
                 >
-                    {LANGUAGES.map(lang => (
-                        <option key={lang} value={lang}>{lang}</option>
-                    ))}
-                </select>
+                  <Globe className="w-4 h-4 text-orange-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{language}</span>
+                  <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform", langOpen && "rotate-180")} />
+                </button>
+
+                <AnimatePresence>
+                  {langOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full mt-2 left-0 z-50 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden"
+                    >
+                      <div className="max-h-64 overflow-y-auto py-1">
+                        {LANGUAGES.map(lang => (
+                          <button
+                            key={lang}
+                            onClick={() => handleLanguageChange(lang)}
+                            className={cn(
+                              "w-full flex items-center justify-between px-3 py-2 text-sm transition-colors",
+                              lang === language
+                                ? "bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 font-medium"
+                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                            )}
+                          >
+                            {lang}
+                            {lang === language && <Check className="w-4 h-4 text-orange-500" />}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Tabs */}

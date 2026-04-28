@@ -24,8 +24,8 @@ async function findNearestPollingStation(zipCode) {
     const placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json', {
       params: {
         location: `${location.lat},${location.lng}`,
-        radius: 5000, // 5km radius
-        keyword: 'community center OR polling station OR school',
+        radius: 3000, 
+        keyword: 'school OR college OR government OR civic',
         key: process.env.GOOGLE_MAPS_API_KEY
       }
     });

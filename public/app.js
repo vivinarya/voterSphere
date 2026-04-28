@@ -61,6 +61,6 @@ window.onload = async () => {
             }
         }, 10);
     } else {
-         appendMessage('Welcome back to VoterSphere! Type "menu" to see your options.', 'bot-msg');
+         appendMessage('Welcome back to VoterSphere! How can I help you with your election questions today?', 'bot-msg');
     }
 };

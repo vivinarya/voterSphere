@@ -25,7 +25,7 @@ app.post('/api/chat', async (req, res) => {
   let reply;
 
   if (message === '/start') {
-    reply = "Welcome to VoterSphere - Your Unbiased Civic Election Assistant!\n\nI am here to demystify the election process, timelines, and procedural steps.\nAre you a (1) First-time voter, (2) Absentee voter, or (3) Student? (Type number)";
+    reply = "Welcome to VoterSphere! I am your AI Civic Assistant.\n\nI'm here to demystify the election process, help you find polling stations, create calendar reminders, or answer any questions you have about voting. How can I help you today?";
   } else {
     reply = await bot.handleInput(message);
   }

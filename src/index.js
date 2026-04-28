@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 const sessions = new Map();
 
 app.post('/api/chat', async (req, res) => {
-  let { sessionId, message } = req.body;
+  let { sessionId, message, language = 'English' } = req.body;
   
   if (!sessionId || !sessions.has(sessionId)) {
     sessionId = crypto.randomUUID();
@@ -25,9 +25,9 @@ app.post('/api/chat', async (req, res) => {
   let reply;
 
   if (message === '/start') {
-    reply = "Welcome to VoterSphere! I am your AI Civic Assistant.\n\nI'm here to demystify the election process, help you find polling stations, create calendar reminders, or answer any questions you have about voting. How can I help you today?";
+    reply = await bot.handleInput(`Introduce yourself warmly in ${language} as VoterSphere. You help with Indian election info, polling booths, and dates. Keep it brief and friendly.`);
   } else {
-    reply = await bot.handleInput(message);
+    reply = await bot.handleInput(`[Respond in ${language}] ${message}`);
   }
 
   res.json({ sessionId, reply });

@@ -5,6 +5,7 @@
 
 /* Base imports */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Custom dark variant for targeting dark mode elements */
 @custom-variant dark (&:is(.dark *));

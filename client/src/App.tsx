@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, User, FileText, MapPin, CreditCard, Building2, AlertCircle, Info, Send } from "lucide-react";
+import { Bot, User, FileText, MapPin, CreditCard, Building2, AlertCircle, Info, Send, Trash2, Globe } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { cn } from "./lib/utils";
 
 import { Timeline } from "./components/Timeline";
@@ -16,6 +17,8 @@ interface Message {
 }
 
 type Tab = "chat" | "timeline" | "steps";
+
+const LANGUAGES = ["English", "Hindi", "Tamil", "Telugu", "Bengali", "Marathi", "Gujarati", "Kannada", "Malayalam", "Punjabi", "Odia"];
 
 function ChatMessage({ message }: { message: Message }) {
   const isBot = message.type === "bot";
@@ -53,7 +56,15 @@ function ChatMessage({ message }: { message: Message }) {
           <div className={cn(
             "text-sm leading-relaxed",
             isBot ? "text-gray-800 dark:text-gray-100" : "text-white"
-          )} dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br>') }} />
+          )}>
+            {isBot ? (
+                <ReactMarkdown className="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-sm">
+                    {message.content}
+                </ReactMarkdown>
+            ) : (
+                <span className="whitespace-pre-wrap">{message.content}</span>
+            )}
+          </div>
         </motion.div>
         
         <div className={cn(
@@ -97,39 +108,52 @@ function IndianVoterAssistant() {
   const [input, setInput] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [sessionId, setSessionId] = React.useState("");
+  const [language, setLanguage] = React.useState("English");
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    let storedSession = localStorage.getItem('votersphere_session');
-    if (!storedSession) {
-      storedSession = "";
-    } else {
-        setSessionId(storedSession);
+  const sendStart = React.useCallback(async (session: string, lang: string) => {
+    setIsLoading(true);
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: session, message: '/start', language: lang })
+        });
+        const data = await res.json();
+        if (!session || session !== data.sessionId) {
+            localStorage.setItem('votersphere_session', data.sessionId);
+            setSessionId(data.sessionId);
+        }
+        setMessages([{
+            id: Date.now().toString(),
+            type: "bot",
+            content: data.reply,
+            timestamp: new Date()
+        }]);
+    } catch(e) {
+        setMessages([{
+            id: Date.now().toString(),
+            type: "bot",
+            content: "Error connecting to AI assistant.",
+            timestamp: new Date()
+        }]);
+    } finally {
+        setIsLoading(false);
     }
-
-    // Send start message
-    const sendStart = async () => {
-        try {
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: storedSession, message: '/start' })
-            });
-            const data = await res.json();
-            if (!storedSession || storedSession !== data.sessionId) {
-                localStorage.setItem('votersphere_session', data.sessionId);
-                setSessionId(data.sessionId);
-            }
-            setMessages([{
-                id: Date.now().toString(),
-                type: "bot",
-                content: data.reply,
-                timestamp: new Date()
-            }]);
-        } catch(e) {}
-    };
-    sendStart();
   }, []);
+
+  React.useEffect(() => {
+    let storedSession = localStorage.getItem('votersphere_session') || "";
+    setSessionId(storedSession);
+    sendStart(storedSession, language);
+  }, []);
+
+  const clearChat = () => {
+    localStorage.removeItem('votersphere_session');
+    setSessionId("");
+    setMessages([]);
+    sendStart("", language);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -157,7 +181,7 @@ function IndianVoterAssistant() {
       const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, message: text })
+          body: JSON.stringify({ sessionId, message: text, language })
       });
       const data = await res.json();
       
@@ -194,7 +218,7 @@ function IndianVoterAssistant() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-green-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pb-20">
       {/* Header */}
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 via-white to-green-500 p-0.5 shadow-md">
@@ -205,7 +229,6 @@ function IndianVoterAssistant() {
               <div className="flex-1">
                 <h1 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
                   Voter Sahayak
-                  <span className="text-xs font-normal text-gray-500 dark:text-gray-400 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full">AI Assistant</span>
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Your guide to voting in India
@@ -213,26 +236,54 @@ function IndianVoterAssistant() {
               </div>
             </div>
 
-            {/* Navigation */}
-            <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-full border border-gray-200 dark:border-gray-700 w-full sm:w-auto">
-              <button
-                onClick={() => setActiveTab("chat")}
-                className={cn("flex-1 sm:flex-none px-4 py-1.5 rounded-full text-sm font-medium transition-colors", activeTab === "chat" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
-              >
-                Chat
-              </button>
-              <button
-                onClick={() => setActiveTab("timeline")}
-                className={cn("flex-1 sm:flex-none px-4 py-1.5 rounded-full text-sm font-medium transition-colors", activeTab === "timeline" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
-              >
-                Timeline
-              </button>
-              <button
-                onClick={() => setActiveTab("steps")}
-                className={cn("flex-1 sm:flex-none px-4 py-1.5 rounded-full text-sm font-medium transition-colors", activeTab === "steps" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
-              >
-                Steps
-              </button>
+            {/* Navigation and Actions */}
+            <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+              {/* Language Dropdown */}
+              <div className="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 shadow-sm">
+                <Globe className="w-4 h-4 text-gray-500" />
+                <select 
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    className="bg-transparent text-sm text-gray-700 dark:text-gray-300 outline-none cursor-pointer"
+                >
+                    {LANGUAGES.map(lang => (
+                        <option key={lang} value={lang}>{lang}</option>
+                    ))}
+                </select>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 flex-1 sm:flex-none">
+                <button
+                  onClick={() => setActiveTab("chat")}
+                  className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "chat" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
+                >
+                  Chat
+                </button>
+                <button
+                  onClick={() => setActiveTab("timeline")}
+                  className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "timeline" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
+                >
+                  Timeline
+                </button>
+                <button
+                  onClick={() => setActiveTab("steps")}
+                  className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "steps" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
+                >
+                  Steps
+                </button>
+              </div>
+
+              {/* Clear Chat Button */}
+              {activeTab === "chat" && (
+                  <button 
+                    onClick={clearChat}
+                    title="Clear Chat"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                  >
+                      <Trash2 className="w-5 h-5" />
+                  </button>
+              )}
             </div>
           </div>
         </div>

@@ -2,12 +2,20 @@ FROM node:18-slim
 
 WORKDIR /usr/src/app
 
+# Copy root package files
 COPY package*.json ./
 
-RUN npm install --production
+# Copy client folder and build it first
+COPY client ./client
+RUN cd client && npm install && npm run build
 
-COPY . .
+# Copy the rest of the backend source code
+COPY src ./src
+COPY .env* ./
+
+# Install backend dependencies (production only)
+RUN npm install --production
 
 EXPOSE 8080
 
-CMD [ "node", "src/index.js" ]
+CMD [ "npm", "start" ]

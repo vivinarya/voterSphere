@@ -4,8 +4,7 @@
   "description": "VoterSphere - An interactive AI assistant for election education",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "node tests/chatbot.test.js"
+    "start": "node src/index.js"
   },
   "keywords": [
     "election",

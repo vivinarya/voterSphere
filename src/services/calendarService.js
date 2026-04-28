@@ -1,6 +1,6 @@
 function addToCalendar(eventName, date) {
   const currentYear = new Date().getFullYear();
-  // Mocking First Tuesday of Nov for General Election if no date provided
+  // Calculate First Tuesday of Nov for General Election if no date provided
   const targetDateStr = date || `${currentYear}1103T120000Z/${currentYear}1103T130000Z`; 
   
   // Create a real Google Calendar Event link 

@@ -1,8 +1,8 @@
 const axios = require('axios');
 
 async function findNearestPollingStation(zipCode) {
-  if (!process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_MAPS_API_KEY.includes('mock')) {
-     return `[Mock Maps API] Based on your location (${zipCode}), the nearest polling station is "Community Center, 123 Main St". It is 0.8 miles away and has a ballot drop-off box outside.`;
+  if (!process.env.GOOGLE_MAPS_API_KEY) {
+     return `Error: GOOGLE_MAPS_API_KEY is not configured.`;
   }
 
   try {
@@ -38,7 +38,7 @@ async function findNearestPollingStation(zipCode) {
     return `Could not find a clear polling station near ${zipCode}. Please check your local election website.`;
   } catch (error) {
     console.error('Maps API Error:', error.message);
-    return `[Fallback] Based on your location (${zipCode}), the nearest polling station is "Community Center, 123 Main St".`;
+    return `An error occurred while fetching maps data: ${error.message}`;
   }
 }
 

@@ -3,8 +3,8 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 async function getUpcomingDates() {
   const currentYear = new Date().getFullYear();
   
-  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('mock')) {
-      return `[Mock Search] Verified Election Dates for ${currentYear}:\n- Primary Election: August 6th, ${currentYear}\n- General Election: November 3rd, ${currentYear}`;
+  if (!process.env.GEMINI_API_KEY) {
+      return `Error: GEMINI_API_KEY is not configured.`;
   }
 
   try {
@@ -15,7 +15,7 @@ async function getUpcomingDates() {
     return result.response.text().trim();
   } catch (error) {
     console.error('Gemini API Error:', error.message);
-    return `[Fallback Search] Verified Election Dates for ${currentYear}:\n- Primary Election: August 6th, ${currentYear}\n- General Election: November 3rd, ${currentYear}`;
+    return `An error occurred while fetching the election timeline: ${error.message}`;
   }
 }
 

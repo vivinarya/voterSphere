@@ -5,12 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bot, User, FileText, MapPin, CreditCard, Building2, AlertCircle, Info, Send } from "lucide-react";
 import { cn } from "./lib/utils";
 
+import { Timeline } from "./components/Timeline";
+import { Steps } from "./components/Steps";
+
 interface Message {
   id: string;
   type: "user" | "bot";
   content: string;
   timestamp: Date;
 }
+
+type Tab = "chat" | "timeline" | "steps";
 
 function ChatMessage({ message }: { message: Message }) {
   const isBot = message.type === "bot";
@@ -87,6 +92,7 @@ function QuickActionButton({ icon: Icon, label, onClick }: { icon: any; label: s
 }
 
 function IndianVoterAssistant() {
+  const [activeTab, setActiveTab] = React.useState<Tab>("chat");
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -189,117 +195,142 @@ function IndianVoterAssistant() {
       {/* Header */}
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 via-white to-green-500 p-0.5 shadow-md">
-              <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-orange-600" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 via-white to-green-500 p-0.5 shadow-md">
+                <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-orange-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h1 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                  Voter Sahayak
+                  <span className="text-xs font-normal text-gray-500 dark:text-gray-400 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full">AI Assistant</span>
+                </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Your guide to voting in India
+                </p>
               </div>
             </div>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                Voter Sahayak
-                <span className="text-xs font-normal text-gray-500 dark:text-gray-400 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full">AI Assistant</span>
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Your guide to voting in India • Powered by AI
-              </p>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">Online</span>
+
+            {/* Navigation */}
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-full border border-gray-200 dark:border-gray-700 w-full sm:w-auto">
+              <button
+                onClick={() => setActiveTab("chat")}
+                className={cn("flex-1 sm:flex-none px-4 py-1.5 rounded-full text-sm font-medium transition-colors", activeTab === "chat" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
+              >
+                Chat
+              </button>
+              <button
+                onClick={() => setActiveTab("timeline")}
+                className={cn("flex-1 sm:flex-none px-4 py-1.5 rounded-full text-sm font-medium transition-colors", activeTab === "timeline" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
+              >
+                Timeline
+              </button>
+              <button
+                onClick={() => setActiveTab("steps")}
+                className={cn("flex-1 sm:flex-none px-4 py-1.5 rounded-full text-sm font-medium transition-colors", activeTab === "steps" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
+              >
+                Steps
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Chat Area */}
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* Quick Actions */}
-        {messages.length <= 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-              <Info className="w-4 h-4" />
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <QuickActionButton icon={FileText} label="Apply Voter ID" onClick={() => sendMessage("How do I apply for a Voter ID?")} />
-              <QuickActionButton icon={MapPin} label="Find Booth" onClick={() => sendMessage("Help me find my polling booth")} />
-              <QuickActionButton icon={CreditCard} label="Correct Details" onClick={() => sendMessage("How do I correct my voter details?")} />
-              <QuickActionButton icon={AlertCircle} label="Remote Voting" onClick={() => sendMessage("Can I vote remotely?")} />
-            </div>
-          </motion.div>
-        )}
-
-        {/* Messages */}
-        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-4 sm:p-6 mb-6">
-          <AnimatePresence mode="popLayout">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            {isLoading && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 mb-4">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
-                        <Bot className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-2">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
-                    </div>
-                </motion.div>
-            )}
-          </AnimatePresence>
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-md flex items-center gap-2">
-            <input 
-                type="text" 
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
-                placeholder="Ask Voter Sahayak anything about Indian elections..."
-                className="flex-1 bg-transparent px-4 py-2 outline-none text-gray-800 dark:text-gray-100"
-            />
-            <button 
-                onClick={() => sendMessage(input)}
-                disabled={isLoading || !input.trim()}
-                className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-full p-2.5 transition-colors"
+      {/* Main Area */}
+      {activeTab === "chat" && (
+        <main className="max-w-4xl mx-auto px-4 py-6">
+          {/* Quick Actions */}
+          {messages.length <= 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
             >
-                <Send className="w-5 h-5" />
-            </button>
-        </div>
+              <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                <Info className="w-4 h-4" />
+                Quick Actions
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <QuickActionButton icon={FileText} label="Apply Voter ID" onClick={() => sendMessage("How do I apply for a Voter ID?")} />
+                <QuickActionButton icon={MapPin} label="Find Booth" onClick={() => sendMessage("Help me find my polling booth")} />
+                <QuickActionButton icon={CreditCard} label="Correct Details" onClick={() => sendMessage("How do I correct my voter details?")} />
+                <QuickActionButton icon={AlertCircle} label="Remote Voting" onClick={() => sendMessage("Can I vote remotely?")} />
+              </div>
+            </motion.div>
+          )}
 
-        {/* Quick Options Pills */}
-        {messages.length <= 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-6"
-          >
-            <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Common Questions:</h3>
-            <div className="flex flex-wrap gap-2">
-              {quickOptions.map((option, idx) => (
-                <motion.button
-                  key={idx}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => sendMessage(option)}
-                  className="px-4 py-2 rounded-full text-sm font-medium transition-all shadow-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md"
-                >
-                  {option}
-                </motion.button>
+          {/* Messages */}
+          <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-4 sm:p-6 mb-6">
+            <AnimatePresence mode="popLayout">
+              {messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
               ))}
-            </div>
-          </motion.div>
-        )}
-      </main>
+              {isLoading && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 mb-4">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md">
+                          <Bot className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-2">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+                      </div>
+                  </motion.div>
+              )}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-md flex items-center gap-2">
+              <input 
+                  type="text" 
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
+                  placeholder="Ask Voter Sahayak anything about Indian elections..."
+                  className="flex-1 bg-transparent px-4 py-2 outline-none text-gray-800 dark:text-gray-100"
+              />
+              <button 
+                  onClick={() => sendMessage(input)}
+                  disabled={isLoading || !input.trim()}
+                  className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-full p-2.5 transition-colors"
+              >
+                  <Send className="w-5 h-5" />
+              </button>
+          </div>
+
+          {/* Quick Options Pills */}
+          {messages.length <= 1 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mt-6"
+            >
+              <h3 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Common Questions:</h3>
+              <div className="flex flex-wrap gap-2">
+                {quickOptions.map((option, idx) => (
+                  <motion.button
+                    key={idx}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => sendMessage(option)}
+                    className="px-4 py-2 rounded-full text-sm font-medium transition-all shadow-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-600 hover:shadow-md"
+                  >
+                    {option}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </main>
+      )}
+
+      {activeTab === "timeline" && <Timeline />}
+      {activeTab === "steps" && <Steps />}
 
     </div>
   );

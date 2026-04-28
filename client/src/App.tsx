@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bot, User, FileText, MapPin, CreditCard, Building2, AlertCircle, Info, Send, Trash2, Globe, ChevronDown, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "./lib/utils";
+import { translations } from "./translations";
 
 import { Timeline } from "./components/Timeline";
 import { Steps } from "./components/Steps";
@@ -251,10 +252,10 @@ function IndianVoterAssistant() {
               </div>
               <div className="flex-1">
                 <h1 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                  Voter Sahayak
+                  {translations[language]?.title || translations["English"].title}
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Your guide to voting in India
+                  {translations[language]?.subtitle || translations["English"].subtitle}
                 </p>
               </div>
             </div>
@@ -311,21 +312,21 @@ function IndianVoterAssistant() {
                   aria-label="Chat tab"
                   className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "chat" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
                 >
-                  Chat
+                  {translations[language]?.chatTab || translations["English"].chatTab}
                 </button>
                 <button
                   onClick={() => setActiveTab("timeline")}
                   aria-label="Timeline tab"
                   className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "timeline" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
                 >
-                  Timeline
+                  {translations[language]?.timelineTab || translations["English"].timelineTab}
                 </button>
                 <button
                   onClick={() => setActiveTab("steps")}
                   aria-label="Steps tab"
                   className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "steps" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
                 >
-                  Steps
+                  {translations[language]?.stepsTab || translations["English"].stepsTab}
                 </button>
               </div>
 
@@ -333,7 +334,7 @@ function IndianVoterAssistant() {
               {activeTab === "chat" && (
                   <button 
                     onClick={clearChat}
-                    title="Clear Chat"
+                    title={translations[language]?.clearChat || translations["English"].clearChat}
                     aria-label="Clear chat history"
                     className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
                   >
@@ -397,7 +398,7 @@ function IndianVoterAssistant() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
-                  placeholder="Ask Voter Sahayak anything about Indian elections..."
+                  placeholder={translations[language]?.placeholder || translations["English"].placeholder}
                   aria-label="Type your question about Indian elections"
                   className="flex-1 bg-transparent px-4 py-2 outline-none text-gray-800 dark:text-gray-100"
               />

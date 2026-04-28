@@ -80,8 +80,8 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// Serve React app for all non-API routes
-app.get('*', (req, res) => {
+// Serve React app for all non-API routes (Express 5 syntax)
+app.get('{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 

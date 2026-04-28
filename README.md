@@ -7,7 +7,7 @@ VoterSphere is a full-stack AI assistant that helps Indian citizens navigate the
 - **AI Chat (Gemini 2.5 Flash):** Natural language Q&A tuned exclusively for Indian elections (Lok Sabha, Vidhan Sabha, ECI, NVSP, EVMs, VVPAT).
 - **Polling Booth Finder (Google Maps API):** Geocodes a 6-digit Indian PIN code and finds the nearest school/government building likely used as a booth via the Places API.
 - **Calendar Reminders (Google Calendar):** Generates a one-click Google Calendar link for election dates.
-- **Multilingual Support:** Chat in 11 Indian regional languages — Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, and English.
+- **Multilingual Support:** Chat and UI translations in 11 Indian regional languages — Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, and English.
 - **Election Timeline:** Visual, animated timeline of the standard phases of an Indian general election.
 - **Voter's Journey Steps:** Step-by-step guide from eligibility check to VVPAT verification.
 

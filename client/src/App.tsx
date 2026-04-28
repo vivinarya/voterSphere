@@ -58,9 +58,9 @@ function ChatMessage({ message }: { message: Message }) {
             isBot ? "text-gray-800 dark:text-gray-100" : "text-white"
           )}>
             {isBot ? (
-                <ReactMarkdown className="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-sm">
-                    {message.content}
-                </ReactMarkdown>
+                <div className="prose dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-sm">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
             ) : (
                 <span className="whitespace-pre-wrap">{message.content}</span>
             )}
@@ -244,6 +244,7 @@ function IndianVoterAssistant() {
                 <select 
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
+                    aria-label="Select language"
                     className="bg-transparent text-sm text-gray-700 dark:text-gray-300 outline-none cursor-pointer"
                 >
                     {LANGUAGES.map(lang => (
@@ -256,18 +257,21 @@ function IndianVoterAssistant() {
               <div className="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 flex-1 sm:flex-none">
                 <button
                   onClick={() => setActiveTab("chat")}
+                  aria-label="Chat tab"
                   className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "chat" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
                 >
                   Chat
                 </button>
                 <button
                   onClick={() => setActiveTab("timeline")}
+                  aria-label="Timeline tab"
                   className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "timeline" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
                 >
                   Timeline
                 </button>
                 <button
                   onClick={() => setActiveTab("steps")}
+                  aria-label="Steps tab"
                   className={cn("flex-1 sm:flex-none px-3 py-1 rounded-md text-sm font-medium transition-colors", activeTab === "steps" ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm" : "text-gray-600 dark:text-gray-400")}
                 >
                   Steps
@@ -279,6 +283,7 @@ function IndianVoterAssistant() {
                   <button 
                     onClick={clearChat}
                     title="Clear Chat"
+                    aria-label="Clear chat history"
                     className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
                   >
                       <Trash2 className="w-5 h-5" />
@@ -342,11 +347,13 @@ function IndianVoterAssistant() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
                   placeholder="Ask Voter Sahayak anything about Indian elections..."
+                  aria-label="Type your question about Indian elections"
                   className="flex-1 bg-transparent px-4 py-2 outline-none text-gray-800 dark:text-gray-100"
               />
               <button 
                   onClick={() => sendMessage(input)}
                   disabled={isLoading || !input.trim()}
+                  aria-label="Send message"
                   className="bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-full p-2.5 transition-colors"
               >
                   <Send className="w-5 h-5" />

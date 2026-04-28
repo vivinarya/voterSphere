@@ -11,7 +11,6 @@ RUN cd client && npm install && npm run build
 
 # Copy the rest of the backend source code
 COPY src ./src
-COPY .env* ./
 
 # Install backend dependencies (production only)
 RUN npm install --production

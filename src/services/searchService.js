@@ -9,8 +9,8 @@ async function getUpcomingDates() {
 
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `What are the dates for the upcoming US Primary and General elections in ${currentYear}? Provide a brief 2-line response.`;
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const prompt = `What are the dates for the upcoming Indian state assembly or general elections in ${currentYear}? Provide a brief 2-line response covering only India.`;
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
   } catch (error) {

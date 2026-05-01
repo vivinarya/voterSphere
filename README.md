@@ -102,9 +102,9 @@ The app is containerized and ready for Google Cloud Run:
 
 ## Google Services Integration
 
-| Service | Usage | Real/Mock |
+| Service | Usage | Real |
 |---------|-------|-----------|
-| **Gemini 2.5 Flash** | Conversational AI with function calling | ✅ Real |
-| **Google Maps Geocoding API** | Convert PIN code → lat/lng coordinates | ✅ Real |
-| **Google Maps Places API** | Find nearby polling-station-like venues | ✅ Real |
-| **Google Calendar** | Generate one-click calendar event links | ✅ Real |
+| **Gemini 2.5 Flash** | Conversational AI with function calling
+| **Google Maps Geocoding API** | Convert PIN code → lat/lng coordinates
+| **Google Maps Places API** | Find nearby polling-station-like venues 
+| **Google Calendar** | Generate one-click calendar event links 
